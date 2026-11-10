@@ -1,0 +1,18 @@
+[package]
+name = "importkit-csv"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+license = "MIT"
+description = "CSV parsing in the dialect of ImportKit's csvReader, for its WebAssembly reader."
+repository = "https://github.com/Altitud-Studio-S-L-U/importkit-wasm"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
