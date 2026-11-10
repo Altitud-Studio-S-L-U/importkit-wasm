@@ -123,13 +123,53 @@ impl Parser {
         if let Some(error) = self.error {
             return Err(error);
         }
-        for &byte in input {
-            if let Err(error) = self.byte(byte) {
+        let mut index = 0;
+        while index < input.len() {
+            let run = self.plain_run(&input[index..]);
+            if run > 0 {
+                self.append_plain(&input[index..index + run]);
+                index += run;
+                continue;
+            }
+            if let Err(error) = self.byte(input[index]) {
                 self.error = Some(error);
                 return Err(error);
             }
+            index += 1;
         }
         Ok(())
+    }
+
+    /// Length of the leading bytes that byte-by-byte parsing would only append to the current field: ASCII inside a
+    /// field that is neither a quote nor a line feed, nor, outside quotes, the delimiter or a CR, within the record's
+    /// remaining byte budget. Such bytes are valid UTF-8 on their own and change no line count, so they are copied
+    /// at once. Every other byte takes the full path.
+    fn plain_run(&self, input: &[u8]) -> usize {
+        if self.bom_seen.is_some() || self.utf8_need != 0 {
+            return 0;
+        }
+        let quoted = match self.state {
+            State::Unquoted => false,
+            State::Quoted => true,
+            _ => return 0,
+        };
+        let delimiter = self.delimiter;
+        let budget = (self.max_record_bytes - self.record_bytes).min(input.len() as u64) as usize;
+        input[..budget]
+            .iter()
+            .position(|&byte| {
+                byte >= 0x80
+                    || byte == b'"'
+                    || byte == b'\n'
+                    || (!quoted && (byte == delimiter || byte == b'\r'))
+            })
+            .unwrap_or(budget)
+    }
+
+    fn append_plain(&mut self, bytes: &[u8]) {
+        self.out.extend_from_slice(bytes);
+        self.units += bytes.len() as u32;
+        self.record_bytes += bytes.len() as u64;
     }
 
     /// Ends the input: completes the last record or reports why it cannot be completed.
