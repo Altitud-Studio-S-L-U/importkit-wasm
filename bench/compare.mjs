@@ -91,7 +91,7 @@ console.log(JSON.stringify({
   logicalCores: availableParallelism(),
   importkit: require('@altitud-studio/importkit/package.json').version,
   bytes,
-  records: rows - 0,
+  records: rows,
   rounds,
   reader: summary('reader'),
   import: summary('import'),

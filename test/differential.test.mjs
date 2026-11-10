@@ -94,7 +94,6 @@ test('wasmCsvReader equals the reference model, and csvReader agrees on every va
       }
     },
   ), { numRuns: RUNS });
-  test.diagnostic?.(JSON.stringify(tally));
   console.log(`differential: ${JSON.stringify(tally)}`);
   assert.ok(tally.valid > RUNS / 10 && tally.invalid > RUNS / 10, 'both valid and invalid inputs were generated');
 });
