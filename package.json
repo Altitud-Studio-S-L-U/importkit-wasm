@@ -1,0 +1,36 @@
+{
+  "name": "@altitud-studio/importkit-wasm",
+  "version": "0.1.0",
+  "description": "A CSV reader for ImportKit compiled from Rust to WebAssembly: the records, lines, errors and reader ID of csvReader(), parsed faster.",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
+  "author": "Altitud Studio SLU (https://altitudstudio.ad)",
+  "engines": { "node": ">=24" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": ["dist/index.js", "dist/index.d.ts", "dist/importkit_csv.wasm", "README.md", "CHANGELOG.md", "LICENSE"],
+  "repository": { "type": "git", "url": "git+https://github.com/Altitud-Studio-S-L-U/importkit-wasm.git" },
+  "bugs": { "url": "https://github.com/Altitud-Studio-S-L-U/importkit-wasm/issues" },
+  "homepage": "https://github.com/Altitud-Studio-S-L-U/importkit-wasm#readme",
+  "keywords": ["importkit", "csv", "parser", "webassembly", "wasm", "rust", "streaming", "import", "nodejs"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "check:rust": "cargo fmt --all --check && cargo clippy --all-targets -- -D warnings && cargo clippy --target wasm32-unknown-unknown --release -- -D warnings && cargo test",
+    "check": "npm run check:rust && npm run typecheck && npm test",
+    "benchmark": "npm run build && node bench/compare.mjs"
+  },
+  "peerDependencies": { "@altitud-studio/importkit": "^1.0.0" },
+  "devDependencies": {
+    "@altitud-studio/importkit": "1.0.0",
+    "@types/node": "24.19.2",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}
